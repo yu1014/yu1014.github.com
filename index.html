@@ -311,59 +311,17 @@
       
         
           
-            <p>突然被拉进一个群组，消息咚咚咚的来了，打开一看是个生产问题：MQ数据猛增，一天发了3T+消息，瞬间惊呆。。。默默在想，可不是我搞出来的吧？震惊的同时抓紧查缘由。再此之前，除了大神的分享，自己平时的代码查看，可没接触过rabbitmq啊 无从下手中。。。 </p>
-<p>天赋很重要，然而我有啊！</p>
-<p>开始分析原因，在rabbitmq后台管理界面查询为啥消息量那么大呢，在众多队列中突然发现一个有意思的：<br><img src="https://user-gold-cdn.xitu.io/2018/6/7/163d9adbcac39ea2?w=1198&amp;h=627&amp;f=jpeg&amp;s=102699" alt=""></p>
-<p>内存就占用了2个G，罪魁祸首就是你了。 </p>
-<p>找出队列pporder_tradeRetry,继续往下找，啥也不知道就全局搜索咯。找出一个王二小：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;rabbit:listener-container connection-factory=&quot;connectionFactory&quot; acknowledge=&quot;manual&quot; concurrency=&quot;3&quot;&gt;</span><br><span class="line">		&lt;rabbit:listener queues=&quot;pporder_tradeRetry&quot; ref=&quot;tradeRetryListener&quot;/&gt;</span><br><span class="line">	&lt;/rabbit:listener-container&gt;</span><br><span class="line"></span><br><span class="line">&lt;!-- 队列消费者 --&gt;</span><br><span class="line">	&lt;bean id=&quot;tradeRetryListener&quot; class=&quot;com.yeepay.g3.core.airpay.order.service.mq.listener.TradeRetryListener&quot;/&gt;</span><br></pre></td></tr></table></figure>
-<p>扭头发现方向不对，这是个消费者啊，得找出真凶生产者才行emmmmmm。。。</p>
-<p>继续老办法，全局搜索，哈哈，这回来了一个王小二：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;rabbit:topic-exchange name=&quot;payplus.order.business.status.exchange&quot; durable=&quot;true&quot; auto-delete=&quot;false&quot; id=&quot;businessChangeExchange&quot;&gt;</span><br><span class="line">	&lt;rabbit:bindings&gt;</span><br><span class="line">		&lt;!-- 交易重试 --&gt;</span><br><span class="line">		&lt;rabbit:binding pattern=&quot;*.RETRY&quot; queue=&quot;pporder_tradeRetry&quot;/&gt;</span><br><span class="line">	&lt;/rabbit:bindings&gt;</span><br><span class="line">&lt;/rabbit:topic-exchange&gt;</span><br></pre></td></tr></table></figure>
-<p>找出来了，但是</p>
-<ul>
-<li>topic-exchange是什么鬼。。。</li>
-<li>rabbit:binding又是啥<br>不过这个pattern=”*.RETRY”能看懂点，正则表达式匹配嘛 </li>
-</ul>
-<p>傻瓜程序员解决方法：全局搜索。。。哇咔咔，开始搜“.RETRY”</p>
-<p>功夫不负有心人，找到了。开始分析。。。 </p>
-<p>分析啥啊，啥也不懂，先学习学习rabbitMQ再来吧 </p>
-<p>开始正文解释rabbitMQ</p>
-<h4 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h4><p>  RabbitMQ是一个开源的AMQP实现，服务器端用Erlang语言编写巴拉巴拉的不说了，自己看，自己查，自己百度，额好像有人跟我说合格的程序员都应该COOGLE的</p>
-<h4 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h4><p>应用场景有必要说一下<br>异步处理<br>应用解耦<br>流量削峰</p>
-<h4 id="名词解释"><a href="#名词解释" class="headerlink" title="名词解释"></a>名词解释</h4><p>最关键的东西来了 </p>
-<pre><code>ConnectionFactory、Connection、Channel都是RabbitMQ对外提供的API中最基本的对象。
-</code></pre><p>ConnectionFactory：Connection的制造工厂。  </p>
-<p>Connection：就是一个TCP的连接。Producer和Consumer都是通过TCP连接到RabbitMQ Server的。 </p>
-<p>Channels：虚拟连接。它建立在上述的TCP连接中，数据流动都是在Channel中进行的。我们大部分的业务操作是在Channel这个接口中完成的，包括定义Queue、定义Exchange、绑定Queue与Exchange、发布消息等。</p>
-<p>Virtual Host：一个虚拟概念，类似于权限控制组，一个Virtual Host里面可以有若干个Exchange和Queue，是权限控制的最小粒度，类似namespace。 </p>
-<p>Producer：生产者，数据的发送方。 </p>
-<p>Consumer：消费者，数据的接收方。 </p>
-<p>Queue：Queue（队列）是RabbitMQ的内部对象，用于存储消息。RabbitMQ中的消息都只能存储在Queue中，生产者生产消息并最终投递到Queue中，消费者从Queue中获取消息并消费。 </p>
-<p>Exchange：生产者将消息发送到Exchange（交换器），由Exchange将消息路由到一个或多个Queue中（或者丢弃）。 </p>
-<p>Routing key：生产者在将消息发送给Exchange的时候，一般会指定一个routing key，来指定这个消息的路由规则，而这个routing key需要与Exchange Type及binding key联合使用才能最终生效。 </p>
-<p>Binding key： RabbitMQ中通过Binding key将Exchange与Queue关联起来</p>
-<p>交换机的四种模式：</p>
-<ul>
-<li>direct：转发消息到 routigKey 指定的队列。</li>
-<li>topic：对 key 进行模式匹配，比如ab<em>可以传到到所有 ab</em> 的 queue。</li>
-<li>headers：（这个还没有接触到）</li>
-<li>fanout：转发消息到所有绑定队列，忽略 routigKey </li>
-</ul>
-<p>了解了这些开始分析一下那个让人胆战心惊的生产问题的缘由，123走：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">//放入MQ队列 其中routerKey=WITHDRAW.RETRY</span><br><span class="line">rabbitTemplate.convertAndSend(routerKey, tradeMqEntity);</span><br></pre></td></tr></table></figure>
-<p>topic-exchange根据routerKey进行模式匹配到队列pporder_tradeRetry<br>注意这个队列的定义</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;rabbit:queue name=&quot;pporder_tradeRetry&quot;  durable=&quot;true&quot; auto-delete=&quot;false&quot; exclusive=&quot;false&quot;&gt;</span><br><span class="line">			&lt;rabbit:queue-arguments&gt;</span><br><span class="line">				&lt;entry key=&quot;x-dead-letter-exchange&quot; value=&quot;payplus.order.dead.letter.exchange&quot;/&gt;</span><br><span class="line">			&lt;/rabbit:queue-arguments&gt;</span><br><span class="line">		&lt;/rabbit:queue&gt;</span><br></pre></td></tr></table></figure>
-<p>传说中的死信队列，解释一下什么叫做死信队列 </p>
-<pre><code>DLX, Dead-Letter-Exchange。利用DLX, 当消息在一个队列中变成死信（dead message）之后，它能被重新publish到另一个Exchange
-</code></pre><p>进入死信队列(进入死信的三种方式)：<br>1.消息被拒绝（basic.reject or basic.nack）并且requeue=false<br>2.消息TTL过期<br>3.队列达到最大长度 </p>
-<p>查询日志发现由于某些原因队列pporder_tradeRetry的消费者果然选择了拒绝操作</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">channel.basicReject(message.getMessageProperties().getDeliveryTag(), false);</span><br></pre></td></tr></table></figure>
-<p>由于消息被拒绝，满足死信队列的进入姿势1，于是消息被转发到交换机payplus.order.dead.letter.exchange  查看这个交换机绑定到队列pporder_retryDeadLetterQueue</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;rabbit:queue name=&quot;pporder_retryDeadLetterQueue&quot; durable=&quot;true&quot; auto-delete=&quot;false&quot; exclusive=&quot;false&quot; &gt;</span><br><span class="line">		&lt;rabbit:queue-arguments&gt;</span><br><span class="line">			&lt;!-- 计时单位为毫秒 --&gt;</span><br><span class="line">			&lt;entry key=&quot;x-message-ttl&quot; value=&quot;10000&quot; value-type=&quot;java.lang.Long&quot;/&gt;</span><br><span class="line">			&lt;entry key=&quot;x-dead-letter-exchange&quot; value=&quot;payplus.order.business.status.exchange&quot;/&gt;</span><br><span class="line">		&lt;/rabbit:queue-arguments&gt;</span><br><span class="line">	&lt;/rabbit:queue&gt;</span><br></pre></td></tr></table></figure>
-<p>哇，怎么查都没查到这个队列的消费者，再仔细看看。x-message-ttl这个是啥，好像是个时间。查查发现，是消息TTL过期时间，满足死信队列进入姿势2，又回去一开始的payplus.order.business.status.exchange回去了，于是一直循环一直循环。。。循环到了宇宙毁灭。。。</p>
-
-          
+          突然被拉进一个群组，消息咚咚咚的来了，打开一看是个生产问题：MQ数据猛增，一天发了3T+消息，瞬间惊呆。。。默默在想，可不是我搞出来的吧？震惊的同时抓紧查缘由。再此之前，除了大神的分享，自己平时的代码查看，可没接触过rabbitmq啊 无从下手中。。。 
+天赋很重要，然而我有啊！
+开始分析原因，在r
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/06/07/一起学学rabbitmq/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>

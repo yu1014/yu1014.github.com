@@ -86,18 +86,18 @@
 
 
 
-<meta name="description" content="title: 一起做做JAVA面试题–ArrayList、LinkedList 和 Vector区别date: 2018-06-05 12:39:04type: “tags” 1、List 和 Set 的区别   List常用的实现类ArrayList、LinkedList 和 Vector ArrayList查看源码 123456//初始容量private static final int DE">
+<meta name="description" content="1、List 和 Set 的区别   List常用的实现类ArrayList、LinkedList 和 Vector ArrayList查看源码 123456//初始容量private static final int DEFAULT_CAPACITY = 10;//数据存储(不可序列化的数组)private transient Object[] elementData;//当前容量private">
 <meta name="keywords" content="JAVA">
 <meta property="og:type" content="article">
-<meta property="og:title" content="俞增林的博客">
-<meta property="og:url" content="http://yoursite.com/2018/06/15/一起做做JAVA面试题/index.html">
+<meta property="og:title" content="一起做做JAVA面试题--ArrayList、LinkedList 和 Vector区别">
+<meta property="og:url" content="http://yoursite.com/2018/06/05/一起做做JAVA面试题/index.html">
 <meta property="og:site_name" content="俞增林的博客">
-<meta property="og:description" content="title: 一起做做JAVA面试题–ArrayList、LinkedList 和 Vector区别date: 2018-06-05 12:39:04type: “tags” 1、List 和 Set 的区别   List常用的实现类ArrayList、LinkedList 和 Vector ArrayList查看源码 123456//初始容量private static final int DE">
+<meta property="og:description" content="1、List 和 Set 的区别   List常用的实现类ArrayList、LinkedList 和 Vector ArrayList查看源码 123456//初始容量private static final int DEFAULT_CAPACITY = 10;//数据存储(不可序列化的数组)private transient Object[] elementData;//当前容量private">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-06-15T09:09:19.193Z">
+<meta property="og:updated_time" content="2018-06-15T09:12:48.652Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="俞增林的博客">
-<meta name="twitter:description" content="title: 一起做做JAVA面试题–ArrayList、LinkedList 和 Vector区别date: 2018-06-05 12:39:04type: “tags” 1、List 和 Set 的区别   List常用的实现类ArrayList、LinkedList 和 Vector ArrayList查看源码 123456//初始容量private static final int DE">
+<meta name="twitter:title" content="一起做做JAVA面试题--ArrayList、LinkedList 和 Vector区别">
+<meta name="twitter:description" content="1、List 和 Set 的区别   List常用的实现类ArrayList、LinkedList 和 Vector ArrayList查看源码 123456//初始容量private static final int DEFAULT_CAPACITY = 10;//数据存储(不可序列化的数组)private transient Object[] elementData;//当前容量private">
 
 
 
@@ -127,13 +127,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2018/06/15/一起做做JAVA面试题/"/>
+  <link rel="canonical" href="http://yoursite.com/2018/06/05/一起做做JAVA面试题/"/>
 
 
 
 
 
-  <title> | 俞增林的博客</title>
+  <title>一起做做JAVA面试题--ArrayList、LinkedList 和 Vector区别 | 俞增林的博客</title>
   
 
 
@@ -235,12 +235,12 @@
   
   
 
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  <article class="post post-type-tags" itemscope itemtype="http://schema.org/Article">
   
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/15/一起做做JAVA面试题/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/05/一起做做JAVA面试题/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="俞增林">
@@ -257,7 +257,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline"></h1>
+          <h1 class="post-title" itemprop="name headline">一起做做JAVA面试题--ArrayList、LinkedList 和 Vector区别</h1>
         
 
         <div class="post-meta">
@@ -269,8 +269,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-15T17:09:19+08:00">
-                2018-06-15
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-05T12:39:04+08:00">
+                2018-06-05
               </time>
             
 
@@ -307,8 +307,7 @@
       
 
       
-        <p>title: 一起做做JAVA面试题–ArrayList、LinkedList 和 Vector区别<br>date: 2018-06-05 12:39:04<br>type: “tags”</p>
-<p>1、List 和 Set 的区别  </p>
+        <p>1、List 和 Set 的区别  </p>
 <p>List常用的实现类ArrayList、LinkedList 和 Vector</p>
 <p>ArrayList查看源码</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">//初始容量</span><br><span class="line">private static final int DEFAULT_CAPACITY = 10;</span><br><span class="line">//数据存储(不可序列化的数组)</span><br><span class="line">private transient Object[] elementData;</span><br><span class="line">//当前容量</span><br><span class="line">private int size;</span><br></pre></td></tr></table></figure>
@@ -388,15 +387,15 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/06/07/一起学学rabbitmq/" rel="next" title="一起学学rabbitmq">
-                <i class="fa fa-chevron-left"></i> 一起学学rabbitmq
-              </a>
-            
           </div>
 
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/06/07/一起学学rabbitmq/" rel="prev" title="一起学学rabbitmq">
+                一起学学rabbitmq <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -692,9 +691,9 @@
     
       <script type="text/javascript">
         var disqus_config = function () {
-          this.page.url = 'http://yoursite.com/2018/06/15/一起做做JAVA面试题/';
-          this.page.identifier = '2018/06/15/一起做做JAVA面试题/';
-          this.page.title = '';
+          this.page.url = 'http://yoursite.com/2018/06/05/一起做做JAVA面试题/';
+          this.page.identifier = '2018/06/05/一起做做JAVA面试题/';
+          this.page.title = '一起做做JAVA面试题--ArrayList、LinkedList 和 Vector区别';
         };
         var d = document, s = d.createElement('script');
         s.src = 'https://yuzl.disqus.com/embed.js';

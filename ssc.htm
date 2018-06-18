@@ -1,0 +1,289 @@
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf8" />
+	<script src="http://code.jquery.com/jquery-latest.js"></script>
+</head>
+<body>
+<div id="okay"></div>
+<div id="refushTime" style="color:red"></div>
+<!-- 请输入遗漏期数：<input type="text" id="miss_num" value="10" /> <input type="button" id="change_num_button" value="确定" /> -->
+<div id="resultShow">
+大数遗漏期数：
+万：<span id="max_miss_0"></span>
+千：<span id="max_miss_1"></span>
+百：<span id="max_miss_2"></span>
+十：<span id="max_miss_3"></span>
+个：<span id="max_miss_4"></span>	
+<br/>
+
+小数遗漏期数：
+万：<span id="min_miss_0"></span>
+千：<span id="min_miss_1"></span>
+百：<span id="min_miss_2"></span>
+十：<span id="min_miss_3"></span>
+个：<span id="min_miss_4"></span>	
+<br/>
+
+奇数遗漏期数：
+万：<span id="odd_miss_0"></span>
+千：<span id="odd_miss_1"></span>
+百：<span id="odd_miss_2"></span>
+十：<span id="odd_miss_3"></span>
+个：<span id="odd_miss_4"></span>	
+<br/>
+
+偶数遗漏期数：
+万：<span id="even_miss_0"></span>
+千：<span id="even_miss_1"></span>
+百：<span id="even_miss_2"></span>
+十：<span id="even_miss_3"></span>
+个：<span id="even_miss_4"></span>	
+<br/>
+组三遗漏期数：
+前：<span id="abb_miss_012"></span>
+中：<span id="abb_miss_123"></span>
+后：<span id="abb_miss_234"></span>
+后前：<span id="abb_miss_340"></span>
+<br/>
+
+
+组六遗漏期数：
+前：<span id="abc_miss_012"></span>
+中：<span id="abc_miss_123"></span>
+后：<span id="abc_miss_234"></span>
+后前：<span id="abc_miss_340"></span>
+<br/>
+
+</div>
+<script type="text/javascript">
+	//定时器
+	var timer=null;
+$(document).ready(function(){
+	var now=new Date();
+	var nowMinute=now.getMinutes();
+	var nowSecond=now.getSeconds();
+	var startSecond=(9 - (nowMinute % 10)) * 60 + (60 -nowSecond) + 60 * 2;
+	resetTime(startSecond);
+	var result_line_15;	
+	initData();
+});
+    function showMaxMissNum(place){   	
+    	for(var i=0;i<result_line_15.length;i++){
+    		var openResult=result_line_15[i].opencode.split(",");
+    		if(openResult[place] > 4 ){
+    			$("#max_miss_"+place).html(i);
+    			break;
+    		}
+    	}    	   	
+    }
+    
+    function showMinMissNum(place){   	
+    	for(var i=0;i<result_line_15.length;i++){
+    		var openResult=result_line_15[i].opencode.split(",");
+    		if(openResult[place] < 4 ){
+    			$("#min_miss_"+place).html(i);
+    			break;
+    		}
+    	}    	   	
+    }
+    
+    function showOddMissNum(place){   	
+    	for(var i=0;i<result_line_15.length;i++){
+    		var openResult=result_line_15[i].opencode.split(",");
+    		if((openResult[place] % 2) == 1 ){
+    			$("#odd_miss_"+place).html(i);
+    			break;
+    		}
+    	}    	   	
+    }
+    
+    function showEvenMissNum(place){   	
+    	for(var i=0;i<result_line_15.length;i++){
+    		var openResult=result_line_15[i].opencode.split(",");
+    		if((openResult[place] % 2) ==  0){
+    			$("#even_miss_"+place).html(i);
+    			break;
+    		}
+    	}    	   	
+    }
+    //组三
+    function showABBMissNum(one, two, three){   	
+    	for(var i=0;i<result_line_15.length;i++){
+    		var openResult=result_line_15[i].opencode.split(",");
+    		var set=new Set();
+    		set.add(openResult[one]);
+    		set.add(openResult[two]);
+    		set.add(openResult[three]);
+    		if(set.size == 3){
+    			$("#abb_miss_"+one+two+three).html(i);
+    			break;
+    		}
+    	}    	   	
+    }
+    
+    //组六
+    function showABCMissNum( one, two, three){   	
+    	for(var i=0;i<result_line_15.length;i++){
+    		var openResult=result_line_15[i].opencode.split(",");
+    		var set=new Set();
+    		set.add(openResult[one]);
+    		set.add(openResult[two]);
+    		set.add(openResult[three]);
+    		if(set.size < 3){
+    			$("#abc_miss_"+one+two+three).html(i);
+    			break;
+    		}
+    	}    	   	
+    }
+    function showColor(){
+    	var redNum=7;
+    	var abbNum=3;
+    	var abcNum=12;
+	    $("span[id^=max]").each(function(){
+	    	if($(this).html() > redNum){
+	    	$(this).css("color","red");
+	    	}
+	    });
+	    $("span[id^=min]").each(function(){
+	    	if($(this).html() > redNum){
+	    	$(this).css("color","red");
+	    	}
+	    });
+	    $("span[id^=odd]").each(function(){
+	    	if($(this).html() > redNum){
+	    	$(this).css("color","red");
+	    	}
+	    });
+	    $("span[id^=even]").each(function(){
+	    	if($(this).html() > redNum){
+	    	$(this).css("color","red");
+	    	}
+	    });	
+	    $("span[id^=abb]").each(function(){
+	    	if($(this).html() > abbNum){
+	    	$(this).css("color","red");
+	    	}
+	    });	
+	    $("span[id^=abc]").each(function(){
+	    	if($(this).html() > abcNum){
+	    	$(this).css("color","red");
+	    	}
+	    });
+  }
+  
+  function initData(){
+  	$("#okay").html("");
+    $.ajax({
+        url: 'http://f.apiplus.net/cqssc-15.json',
+        dataType: 'jsonp',
+        type: 'POST',
+		    timeout: 5000,  //设定超时5秒
+        cache: false,   //禁用缓存
+        jsonp: 'callback',
+        success: function(result){
+				  //$("#okay").append("<br>"+new Date().format("yyyy-MM-dd hh:mm:ss")+"最新开奖结果：<br>");
+				  result_line_15=result.data;	
+				  getNewData();			  
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {  
+            setTimeout(initData,3*1000);
+        }
+        });
+  }
+function getNewData(){
+	$.ajax({
+        url: 'http://chart.cp.360.cn/zst/qkj/?lotId=255401',
+        dataType: 'jsonp',
+        type: 'POST',
+		    timeout: 5000,  //设定超时5秒
+        cache: false,   //禁用缓存
+        jsonp: 'callback',
+        success: function(result){
+        //获取当前期数
+        var Issue="20"+result[0].Issue;
+        if(result_line_15[0].expect != Issue){
+        	var newData={};
+        	newData["expect"]=Issue;
+        	var newstr='';
+        	for(var i=0;i<result[0].WinNumber.length;i++){
+            var tmp=result[0].WinNumber.substring(i, i+1);
+            newstr+=tmp+",";
+          }
+        	newData["opencode"]=newstr;
+        	newData["opentime"]=result[0].EndTime;
+        	result_line_15.unshift(newData);
+        }
+				showResult();			 	
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {  
+            setTimeout(getNewData,3*1000);
+        }
+        });
+} 
+function showResult(){
+	      $("#okay").html("");
+	      for (var i=0; i < result_line_15.length; i++) {			  
+					var p = result_line_15[i].expect;
+					$("#okay").append(p.substr(-3,3)+'  -  ');
+					$("#okay").append(result_line_15[i].opencode+'  -  ');
+					$("#okay").append(result_line_15[i].opentime.split(" ")[1]);
+					$("#okay").append('<br>');			
+				 }
+        //大小奇偶
+				 for(var i=0;i<5;i++){				 	
+					showMaxMissNum(i);
+					showMinMissNum(i);
+					showOddMissNum(i);
+					showEvenMissNum(i);
+				 }
+			 	//组三
+			 	showABBMissNum(0,1,2);
+			 	showABBMissNum(1,2,3);	
+			 	showABBMissNum(2,3,4);
+			 	showABBMissNum(3,4,0);
+			 	
+			 	//组六
+			 	showABCMissNum(0,1,2);
+			 	showABCMissNum(1,2,3);	
+			 	showABCMissNum(2,3,4);
+			 	showABCMissNum(3,4,0);
+			 	
+			 	//报警
+			 	showColor();
+			 	
+			 	//定时，十分钟执行一次
+        setInterval("getNewData()",1000*60*10);
+}
+  //单纯分钟和秒倒计时
+function resetTime(startSecond){
+  var t=startSecond;
+  var m=0;
+  var s=0;
+  m=Math.floor(t/60%60);
+  m<10&&(m='0'+m);
+  s=Math.floor(t%60);
+  function countDown(){
+   s--;
+   s<10&&(s='0'+s);
+   if(s.length>=3){
+    s=59;
+    m="0"+(Number(m)-1);
+   }
+   if(m.length>=3){
+    m='00';
+    s='00';
+    clearInterval(timer);
+    resetTime(10*60);
+    getNewData();   
+   }
+   $("#refushTime").html("请注意剩余刷新时间"+m+"分钟"+s+"秒");
+  }
+  timer=setInterval(countDown,1000);
+}
+
+Date.prototype.format = function(format){	var args = {	"M+" : this.getMonth() + 1,	"d+" : this.getDate(),	"h+" : this.getHours(),	"m+" : this.getMinutes(),	"s+" : this.getSeconds(),	"q+" : Math.floor((this.getMonth() + 3) / 3),  //quarter	
+"S" : this.getMilliseconds()	};	if(/(y+)/.test(format))	format = format.replace(RegExp.$1,(this.getFullYear() + "").substr(4 - RegExp.$1.length));	for(var i in args)	{	var n = args[i];	if(new RegExp("("+ i +")").test(format))	format = format.replace(RegExp.$1,RegExp.$1.length == 1 ? n : ("00" + n).substr(("" + n).length));	}	return format;};
+
+</script>
+</body>
+</html>

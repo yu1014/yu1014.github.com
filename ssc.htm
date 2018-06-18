@@ -1,6 +1,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf8" />
+	<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
 	<script src="https://code.jquery.com/jquery-latest.js"></script>
 </head>
 <body>
@@ -192,7 +193,7 @@ $(document).ready(function(){
   }
 function getNewData(){
 	$.ajax({
-        url: 'http://chart.cp.360.cn/zst/qkj/?lotId=255401',
+        url: 'https://chart.cp.360.cn/zst/qkj/?lotId=255401',
         dataType: 'jsonp',
         type: 'POST',
 		    timeout: 5000,  //设定超时5秒
